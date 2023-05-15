@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.14)
 project(QtAppTask)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -13,5 +13,5 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_subdirectory(src/application)
 add_subdirectory(src)
+add_subdirectory(src/application)

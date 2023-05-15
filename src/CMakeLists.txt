@@ -1,4 +1,4 @@
-add_executable(QtAppTask main.cpp)
+add_executable(QtAppTask main.cpp application/Application.cpp)
 
 target_link_libraries(QtAppTask
         Qt5::Core
@@ -6,5 +6,4 @@ target_link_libraries(QtAppTask
         Qt5::Widgets
         )
 
-target_link_libraries(Application application/Application.h application/Application.cpp)
-target_link_libraries(Parameters application/Parameters.h application/Parameters.cpp)
+target_link_libraries(QtAppTask Parameters)

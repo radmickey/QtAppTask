@@ -1,21 +1,8 @@
 #pragma once
 
-#include <utility>
-#include <QApplication>
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QBoxLayout>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QFile>
+#include <QString>
 
-enum TYPE_PARAMETER {
+enum class TYPE_PARAMETER {
     LineEdit,
     CheckBox,
     SpinBox,
@@ -27,88 +14,60 @@ class Parameter {
     QString name_;
     QString label_;
 public:
-    Parameter(TYPE_PARAMETER type, QString name, QString label) : type_(type), name_(std::move(name)), label_(std::move(label)) {}
+    Parameter(TYPE_PARAMETER type, QString name, QString label);
 
     virtual ~Parameter() = default;
 
     virtual bool isChanged() = 0;
 
-    TYPE_PARAMETER GetType() const {
-        return type_;
-    }
+    TYPE_PARAMETER GetType() const;
 
-    QString GetName() const {
-        return name_;
-    }
+    const QString& GetName() const;
 
-    QString GetLabel() const {
-        return label_;
-    }
+    const QString& GetLabel() const;
 };
 
 class LineEditParameter : public Parameter {
     QString original_text_;
     QString data_;
-
     QString modified_data_;
 
 public:
-    LineEditParameter(QString original_text, QString data, QString name, QString label) :
-            Parameter(TYPE_PARAMETER::LineEdit, std::move(name), std::move(label)),
-            original_text_(std::move(original_text)), data_(std::move(data)), modified_data_(data_) {}
-    bool isChanged() override {
-        return data_!= modified_data_;
-    }
+    LineEditParameter(QString name, QString original_text, QString data, QString label);
 
-    QString GetOriginalText() const {
-        return original_text_;
-    }
+    LineEditParameter(const LineEditParameter& other) : Parameter(TYPE_PARAMETER::LineEdit, other.GetName(), other.GetLabel()),
+                                                        original_text_(other.GetOriginalText()), data_(other.GetValue()), modified_data_(data_) {}
 
-    QString GetValue() const {
-        return data_;
-    }
+    bool isChanged() override;
 
-    void SetValue(QString data) {
-        data_ = std::move(data);
-    }
+    const QString& GetOriginalText() const;
 
-    QString GetModifiedValue() const {
-        return modified_data_;
-    }
+    const QString& GetValue() const;
 
-    void SetModifiedValue(QString data) {
-        modified_data_ = std::move(data);
-    }
+    void SetValue(QString data);
 
+    const QString& GetModifiedValue() const;
+
+    void SetModifiedValue(QString data);
 };
 
 class CheckBoxParameter : public Parameter {
     bool status_;
     bool modified_status_;
 public:
-    CheckBoxParameter(QString name, QString label, bool status = false) :
-            Parameter(TYPE_PARAMETER::CheckBox, std::move(name),
-                      std::move(label)), status_(status), modified_status_(status) {}
+    CheckBoxParameter(QString name, QString label, bool status = false);
 
-    bool isChanged() override {
-        return status_!= modified_status_;
-    }
+    CheckBoxParameter(const CheckBoxParameter& other);
 
-    bool GetValue() const {
-        return status_;
-    }
+    bool isChanged() override;
 
-    void SetValue(bool status) {
-        status_ = status;
-    }
+    bool GetValue() const;
 
-    bool GetModifiedValue() const {
-        return modified_status_;
-    }
+    void SetValue(bool status);
 
-    void SetModifiedValue(bool status) {
-        modified_status_ = status;
-    }
+    bool GetModifiedValue() const;
+
+    void SetModifiedValue(bool status);
 
 };
 
@@ -123,6 +82,10 @@ public:
     SpinBoxParameter(TYPE_PARAMETER type, QString name, QString label, T min, T max, T start_value, T step) :
             Parameter(type, std::move(name), std::move(label)),
             min_(min), max_(max), step_(step), default_value_(start_value), modified_value_(start_value) {}
+
+    SpinBoxParameter(const SpinBoxParameter& other) : Parameter(other.GetType(), other.GetName(), other.GetLabel()),
+            min_(other.GetMin()), max_(other.GetMax()), step_(other.GetStep()),
+            default_value_(other.GetValue()), modified_value_(other.GetModifiedValue()) {}
 
     bool isChanged() override {
         return default_value_ != modified_value_;
